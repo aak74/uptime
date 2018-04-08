@@ -1,0 +1,59 @@
+version: '2'
+
+services:
+  nginx:
+    build: ./containers/nginx
+    container_name: uptime-nginx
+    ports:
+      - 80:80
+    depends_on:
+      - nodejs      
+    volumes_from:
+      - uptime-source
+    volumes:
+      - ./logs:/var/log/nginx
+      - ./server:/app
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+    command: nginx -g "daemon off;"
+    restart: always
+  nodejs:
+    build: ./server
+    container_name: nodejs
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    volumes_from:
+      - uptime-source
+    volumes:
+      - ./server:/app
+    restart: always
+  mongo:
+    image: mongo
+    container_name: uptime-mongodb
+    hostname: uptime-mongodb
+    ports:
+      - 27017:27017
+    volumes_from:
+      - uptime-source
+    volumes:
+      - ./data/mongo:/data/db
+    restart: always
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: uptime-rabbitmq
+    container_name: uptime-rabbitmq
+    ports:
+      - 15672:15672
+    restart: always
+    volumes_from:
+      - uptime-source
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
+  "uptime-source":
+    image: alpine:latest
+    container_name: uptime-source
+    volumes:
+      - /etc/localtime:/etc/localtime/:ro
