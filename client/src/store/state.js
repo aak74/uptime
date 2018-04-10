@@ -1,5 +1,5 @@
-module.exports = {
-  prefix: 'sites/',
+export default {
+  serverURI: '/api/v1/',
   data: {
     sites: [],
   },

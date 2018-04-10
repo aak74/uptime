@@ -1,12 +1,15 @@
-const axios = require('axios');
+import api from '../api';
 
-const loadAll = ({
-  state,
-}) => {
-  // console.log('loadAll', state)
-  // state.data.sites = require('../mock/sites')
+const loadAll = ({ state }) => {
+  console.warn('api', api);
+  api.request('get', 'projects', {})
+    .then((response) => {
+      console.warn('response', response);
+      state.data.sites = response.data;
+    });
   state.status.loading = false;
 };
+/*
 
 const ping = ({
   state,
@@ -65,9 +68,9 @@ const next = (state) => {
   }
 }
 */
-module.exports = {
+export default {
   loadAll,
-  ping,
-  start,
-  stop,
+  // ping,
+  // start,
+  // stop,
 };

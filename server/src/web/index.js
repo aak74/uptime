@@ -18,7 +18,7 @@ app.get('/', (request, response) => {
   
 })
 
-app.get('/projects', (request, response) => {
+app.get('/api/v1/projects', (request, response) => {
   console.log('/projects', request.url);
   response.json(projects)
 })

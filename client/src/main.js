@@ -15,3 +15,6 @@ new Vue({
   components: { App },
   template: '<App/>',
 });
+
+store.commit('LOADING');
+store.dispatch('loadAll', store);
