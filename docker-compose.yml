@@ -30,6 +30,16 @@ services:
     volumes:
       - ./server:/app
     restart: always
+  # pinger:
+  #   build: ./pinger
+  #   container_name: pinger
+  #   env_file:
+  #     - ./pinger/.env
+  #   volumes_from:
+  #     - uptime-source
+  #   volumes:
+  #     - ./server:/app
+  #   restart: always
   mongo:
     image: mongo
     container_name: uptime-mongodb
