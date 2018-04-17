@@ -9,19 +9,6 @@ import (
 	"time"
 )
 
-func MakeRequest(url string, ch chan<- string) {
-	start := time.Now()
-	resp, _ := http.Get(url)
-	secs := time.Since(start).Seconds()
-	if resp == nil {
-		fmt.Print(resp)
-		ch <- fmt.Sprintf("%.2f elapsed with response length: %d %s", secs, 0, url)
-	} else {
-		body, _ := ioutil.ReadAll(resp.Body)
-		ch <- fmt.Sprintf("%.2f elapsed with response length: %d %s", secs, len(body), url)
-	}
-}
-
 type Site struct {
 	ID string `json:"id"`
 	// Domain string `json:"domain"`
@@ -49,6 +36,18 @@ func GetUrls() (sites []Site, err error) {
 	return
 }
 
+func MakeRequest(url string, ch chan<- string, i int) {
+	start := time.Now()
+	resp, _ := http.Get(url)
+	secs := time.Since(start).Seconds()
+	if resp == nil {
+		ch <- fmt.Sprintf("%d task fail after %.2fs: %s", i, secs, url)
+	} else {
+		body, _ := ioutil.ReadAll(resp.Body)
+		ch <- fmt.Sprintf("%d task %.2fs elapsed with response length: %d %s", i, secs, len(body), url)
+	}
+}
+
 func main() {
 	var sites, err = GetUrls()
 	// fmt.Print(sites, err)
@@ -56,14 +55,17 @@ func main() {
 		// fmt.Print(sites)
 		// return fmt.Print(urls)
 		start := time.Now()
-		ch := make(chan string)
-		for _, url := range sites {
-			go MakeRequest(url.URL, ch)
+		ch := make(chan string, 20)
+		for i, url := range sites {
+			go MakeRequest(url.URL, ch, i)
 		}
 
-		for range sites {
-			fmt.Println(<-ch)
+		for i := range sites {
+			res, _ := <-ch
+			fmt.Println(fmt.Printf("%d/%d - %s", i+1, len(sites), res))
 		}
+		close(ch)
+
 		fmt.Printf("%.2fs elapsed\n", time.Since(start).Seconds())
 
 	}
