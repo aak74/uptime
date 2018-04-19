@@ -98,6 +98,7 @@ func request(ch chan<- string, done <-chan bool, url string, i int) {
 	if resp == nil {
 		ch <- fmt.Sprintf("%d task fail after %.2fs: %s", i, secs, url)
 	} else {
+		defer resp.Body.Close()
 		body, _ := ioutil.ReadAll(resp.Body)
 		ch <- fmt.Sprintf("%d task %.2fs elapsed with response length: %d %s", i, secs, len(body), url)
 	}
